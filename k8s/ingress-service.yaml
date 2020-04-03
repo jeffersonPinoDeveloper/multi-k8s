@@ -5,10 +5,32 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$1
+    #HTTPS SIDE
+    certmanager.k8s.io/cluster-issuer: 'letsencrypt-prod'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
     # UPDATE THIS LINE ABOVE
 spec:
+  tls:
+    - hosts:
+        - jeffersonpino.co
+        - www.jeffersonpino.co
+      secretName: jeffersonpino-co
   rules:
-    - http:
+    - host: jeffersonpino.co
+      http:
+        paths:
+          - path: /?(.*)
+          # UPDATE THIS LINE ABOVE
+            backend:
+              serviceName: client-cluster-ip-service
+              servicePort: 3000
+          - path: /api/?(.*)
+          # UPDATE THIS LINE ABOVE
+            backend:
+              serviceName: server-cluster-ip-service
+              servicePort: 5000
+    - host: www.jeffersonpino.co
+      http:
         paths:
           - path: /?(.*)
           # UPDATE THIS LINE ABOVE
